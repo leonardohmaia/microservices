@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = "postgresql://postgres:admin@localhost:5432/BNCDatabase"
+}
+
+model Worker {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  role      String
+  cpf       String   @unique
+  password  String
+}
+
+model Schedule {
+  id        String   @id @default(uuid())
+  status    Boolean  @default(false)
+  schedule  DateTime
+  hour      String
+  cellphone String
+  address   String
+  client    String
+  services  String
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id                   String                 @id @default(uuid())
+  name                 String
+  quantity             Int
+  price                Decimal
+  image                String
+  description          String
+  createdAt            DateTime               @default(now())
+  ProductsCartOnClient ProductsCartOnClient[]
+}
+
+model Client {
+  id                   String                 @id @default(uuid())
+  email                String                 @unique
+  address              String?
+  cellphone            String?
+  role                 String?
+  password             String
+  creditCard           String?
+  createdAt            DateTime               @default(now())
+  socialSecurityNumber String?                @unique
+  ProductsCartOnClient ProductsCartOnClient[]
+}
+
+model ProductsCartOnClient {
+  id        String  @id @default(uuid())
+  quantity  Int
+  productId String
+  clientId  String
+  client    Client  @relation(fields: [clientId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([productId, clientId])
+}
